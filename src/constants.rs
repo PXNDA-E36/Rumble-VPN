@@ -37,3 +37,22 @@ pub static TLS_ALPN_PROTOCOLS: Lazy<Vec<Vec<u8>>> = Lazy::new(|| vec![b"rumble".
 
 /// Async runtime used by Quinn
 pub static QUINN_RUNTIME: Lazy<Arc<dyn Runtime>> = Lazy::new(|| Arc::new(quinn::TokioRuntime));
+
+/// macOS BS:
+/// Represents the size of the packet info header on UNIX systems.
+#[cfg(target_os = "macos")]
+pub const DARWIN_PI_HEADER_LENGTH: usize = 4;
+
+/// Represents MacOS packet info header for IPv4
+#[cfg(target_os = "macos")]
+pub const DARWIN_PI_HEADER_IPV4: [u8; 4] = [0_u8, 0_u8, 0_u8, libc::AF_INET as u8];
+
+/// Represents MacOS packet info header for IPv6
+#[cfg(target_os = "macos")]
+pub const DARWIN_PI_HEADER_IPV6: [u8; 4] = [0_u8, 0_u8, 0_u8, libc::AF_INET6 as u8];
+
+/// Represents the supported TLS cipher suites for Quincy.
+pub static QUINCY_CIPHER_SUITES: &[rustls::SupportedCipherSuite] = &[
+    rustls::cipher_suite::TLS13_AES_256_GCM_SHA384,
+    rustls::cipher_suite::TLS13_CHACHA20_POLY1305_SHA256,
+];
