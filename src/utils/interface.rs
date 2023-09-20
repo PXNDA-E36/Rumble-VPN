@@ -75,13 +75,13 @@ pub async fn write_to_interface(interface: &mut WriteHalf<AsyncDevice>, data: By
     Ok(())
 }
 
-/// Prepends the packet info header to the packet.
+/// Adds packet info header to the packet
 ///
-/// ### Arguments
-/// - `data` - the packet to be prepended
+/// Arguments
+/// `data` - the packet to be prepended
 ///
-/// ### Returns
-/// - `Bytes` - the prepended packet
+/// Returns
+/// `Bytes` - the prepended packet
 #[cfg(target_os = "macos")]
 #[inline]
 fn prepend_packet_info_header(data: Bytes) -> Result<Bytes> {
@@ -107,11 +107,11 @@ fn prepend_packet_info_header(data: Bytes) -> Result<Bytes> {
 
 /// Truncates the packet info header from the packet.
 ///
-/// ### Arguments
-/// - `data` - the packet to be truncated
+/// Arguments
+/// `data` - the packet to be truncated
 ///
-/// ### Returns
-/// - `Bytes` - the truncated packet
+/// Returns
+/// `Bytes` - the truncated packet
 #[cfg(target_os = "macos")]
 #[inline]
 fn truncate_packet_info_header(data: BytesMut) -> Bytes {
