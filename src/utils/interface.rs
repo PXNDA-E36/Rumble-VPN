@@ -74,3 +74,48 @@ pub async fn write_to_interface(interface: &mut WriteHalf<AsyncDevice>, data: By
 
     Ok(())
 }
+
+/// Prepends the packet info header to the packet.
+///
+/// ### Arguments
+/// - `data` - the packet to be prepended
+///
+/// ### Returns
+/// - `Bytes` - the prepended packet
+#[cfg(target_os = "macos")]
+#[inline]
+fn prepend_packet_info_header(data: Bytes) -> Result<Bytes> {
+    use crate::constants::DARWIN_PI_HEADER_IPV4;
+    use crate::constants::DARWIN_PI_HEADER_IPV6;
+    use anyhow::anyhow;
+    use etherparse::IpHeader;
+    use etherparse::PacketHeaders;
+
+    let packet_headers = PacketHeaders::from_ip_slice(&data)?;
+    let ip_header = packet_headers
+        .ip
+        .ok_or_else(|| anyhow!("Received packet with invalid IP header"))?;
+
+    let pi_header = match ip_header {
+        IpHeader::Version4(_, _) => Bytes::from_static(DARWIN_PI_HEADER_IPV4.as_ref()),
+        IpHeader::Version6(_, _) => Bytes::from_static(DARWIN_PI_HEADER_IPV6.as_ref()),
+    };
+
+    // TODO: Do not copy
+    Ok([pi_header.as_ref(), data.as_ref()].concat().into())
+}
+
+/// Truncates the packet info header from the packet.
+///
+/// ### Arguments
+/// - `data` - the packet to be truncated
+///
+/// ### Returns
+/// - `Bytes` - the truncated packet
+#[cfg(target_os = "macos")]
+#[inline]
+fn truncate_packet_info_header(data: BytesMut) -> Bytes {
+    use crate::constants::DARWIN_PI_HEADER_LENGTH;
+
+    Bytes::from(data).slice(DARWIN_PI_HEADER_LENGTH..)
+}
