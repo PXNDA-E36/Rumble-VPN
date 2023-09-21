@@ -80,7 +80,7 @@ impl RumbleConnection {
 
         while let Some(task) = self.tasks.pop() {
             if let Some(Err(e)) = join_or_abort_task(task, timeout).await {
-                error!("An error occurred in Quincy connection: {e}")
+                error!("An error occurred in the Rumble connection: {e}")
             }
         }
 
